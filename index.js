@@ -106,8 +106,8 @@ const displaySupply = (name) => async (supplyData) => {
 };
 
 const displayAll = () => async (supplyData) => {
+    logSuccess(chalk.green('All Supplies:'));
     for (const [key, val] of Object.entries(supplyData)) {
-        logSuccess('All Supplies');
         logSuccess(key, val.amount);
     }
 };
