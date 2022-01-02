@@ -5,11 +5,11 @@
 Easily manage counts of things. Can be counts of anything, widgets, dollars, minutes, etc.
 
 
-## Features (i.e. TODO right now)
+## Usage (i.e. TODO right now)
 
-[] `create` command to create a new supply
-    * `--create [-c] --name [-n] kittens` creates a new supply named kittens
-[] `read` command to read the current count of a given supply
-[] `update` command to update the current count of a given supply
-[] `delete` command to delete a supply
+[x] `create` command to create a new supply
+    * `create --name [-n] kittens` creates a new supply named kittens
+[x] `read` command to read the current count of a given supply
+[x] `update` command to update the current count of a given supply
+[x] `delete` command to delete a supply
 
