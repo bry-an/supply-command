@@ -186,11 +186,11 @@ const determineAction = (args) => {
         const name = argVector[1];
         const identifier = args['i'] || args['identifier'];
         const newAmount = args['e'] || args['element'];
-        if (name === undefined || amount === undefined) {
+        if (name === undefined || newAmount === undefined) {
             logError('Usage: ./index.js set <supplyName> [-i [--identifier] <identifier>] <amount>');
             return;
         }
-        logSuccess('Updated', chalk.yellow(name), 'to', chalk.white(amount));
+        logSuccess('Updated', chalk.yellow(name), 'to', chalk.white(newAmount));
         return updateSupply({ name, newAmount, identifier });
         
     }
