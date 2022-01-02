@@ -99,7 +99,7 @@ const displaySupply = (name) => async (supplyData) => {
     }
     logSuccess(chalk.yellow(name), 'is currently', chalk.white(supplyData[name].amount));
     if (supplyData[name].identifier) {
-        logSuccess(chalk.yellow(name), 'has data', chalk.white(supplyData[name].identifier));
+        logSuccess(chalk.yellow(name), 'has identifier', chalk.white(supplyData[name].identifier));
     }
 };
 
@@ -126,7 +126,7 @@ const determineAction = (args) => {
     if (argVector.includes('create')) {
         const supplyName = args['name'] || args['n'];
         if (supplyName === undefined) {
-            logError('Usage: scom create --name [-n] <name>');
+            logError('Usage: ./index.js create --name [-n] <name>');
             return;
         }
         return createSupply(supplyName);
@@ -134,7 +134,7 @@ const determineAction = (args) => {
     if (argVector.includes('show')) {
         const supplyName = argVector[1];
         if (supplyName === undefined) {
-            logError('Usage: scom show <supply>');
+            logError('Usage: ./index.js show <supply>');
             return;
         }
         return displaySupply(supplyName);
@@ -144,7 +144,7 @@ const determineAction = (args) => {
         const identifier = args['i'] || args['identifier'];
         const amounts = args['e'] || args['element'];
         if (supplyName === undefined) {
-            logError('Usage: scom increase <supplyName> [-i [--identifier] <identifier>] -e [--element] <element0>, -e [--element] /* ... ,*/ -e [--element] <elementN>)');
+            logError('Usage: ./index.js increase <supplyName> [-i [--identifier] <identifier>] -e [--element] <element0>, -e [--element] /* ... ,*/ -e [--element] <elementN>');
             return;
         }
         return increaseSupply(supplyName, sum(ensureArray(amounts)), identifier);
@@ -154,7 +154,7 @@ const determineAction = (args) => {
         const identifier = args['i'] || args['identifier'];
         const amounts = args['e'] || args['element'];
         if (supplyName === undefined || amounts === undefined) {
-            logError('Usage: scom decrease <supplyName> [-i [--identifier] <identifier>] -e [--element] <element0>, -e [--element] /* ... ,*/ -e [--element] <elementN>)');
+            logError('Usage: ./index.js decrease <supplyName> [-i [--identifier] <identifier>] -e [--element] <element0>, -e [--element] /* ... ,*/ -e [--element] <elementN>');
             return;
         }
         return decreaseSupply(supplyName, sum(ensureArray(amounts)), identifier);
@@ -175,7 +175,7 @@ const determineAction = (args) => {
     if (argVector.includes('delete')) {
         const supplyName = argVector[1];
         if (supplyName === undefined) {
-            logError('Usage: scom delete <supplyName>');
+            logError('Usage: ./index.js delete <supplyName>');
             return;
         }
         return deleteSupply(supplyName);
@@ -185,24 +185,24 @@ const determineAction = (args) => {
         const identifier = args['i'] || args['identifier'];
         const amount = args['e'] || args['element'];
         if (supplyName === undefined || amount === undefined) {
-            logError('Usage: scom set <supplyName> [-i [--identifier] <identifier>] <amount>');
+            logError('Usage: ./index.js set <supplyName> [-i [--identifier] <identifier>] <amount>');
             return;
         }
         logSuccess('Updated', chalk.yellow(supplyName), 'to', chalk.white(amount));
         return updateSupply(supplyName, amount, identifier);
         
     }
-    if (args.helpme) {
-        logSuccess('Create a supply', chalk.green('scom create -n [--name] <supplyName>'));
-        logSuccess('Increase the amount of a supply', chalk.green('scom increase <identifier> <supplyName> <element0>, <element1>, /* ... ,*/ <elementN>'));
-        logSuccess('Decrease the amount of a supply', chalk.green('scom decrease <identifier> <supplyName> <element0>, <element1>, /* ... ,*/ <elementN>'));
-        logSuccess('Set the amount of a supply explicitly', chalk.green('scom set <identifier> <supplyName> <element>'));
-        logSuccess('Get current amount of supply', chalk.green('scom show <supplyName>'));
-        logSuccess('Delete a supply', chalk.green('scom delete <supplyName>'));
-        logSuccess('Delete all supplies', chalk.green('scom delete-all <supplyName>'));
+    if (args.usage) {
+        logSuccess('Create a supply', chalk.green('./index.js create -n [--name] <supplyName>'));
+        logSuccess('Increase the amount of a supply', chalk.green('./index.js increase <supplyName> [-i [--identifier] <identifier>] -e [--element] <element0>, -e [--element] /* ... ,*/ -e [--element] <elementN>'));
+        logSuccess('Decrease the amount of a supply', chalk.green('./index.js decrease <supplyName> [-i [--identifier] <identifier>] -e [--element] <element0>, -e [--element] /* ... ,*/ -e [--element] <elementN>'));
+        logSuccess('Set the amount of a supply explicitly', chalk.green('./index.js set <supplyName> [-i [--identifier] <identifier>] -e [--element] <element0>, -e [--element] /* ... ,*/ -e [--element] <elementN>'));
+        logSuccess('Get current amount of supply', chalk.green('./index.js show <supplyName>'));
+        logSuccess('Delete a supply', chalk.green('./index.js delete <supplyName>'));
+        logSuccess('Delete all supplies', chalk.green('./index.js delete-all <supplyName>'));
         return;
     }
-    logError('Unknown command. See scom --help');
+    logError('Unknown command. See ./index.js --usage');
 };
 
 const main = async () => {
