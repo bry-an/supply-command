@@ -35,16 +35,18 @@ const createSupply = (name) => async (supplyData) => {
     }
 };
 
-const updateSupply = (name, newAmount, identifier) => async (supplyData) => {
+const updateSupply = ({ name, newAmount, identifier }) => async (supplyData) => {
     if (!Object.hasOwnProperty.call(supplyData, name)) {
         logError('That supply does not exist');
         return supplyData;
     }
-    if (!isNumber(newAmount)) {
-        logError('Error: Amounts must be numbers in the current configuration');
-        return;
+    if (newAmount) {
+        if (!isNumber(newAmount)) {
+            logError('Error: Amounts must be numbers in the current configuration');
+            return;
+        }
+        supplyData[name].amount = newAmount;
     }
-    supplyData[name].amount = newAmount;
     if (identifier) {
         supplyData[name].identifier = identifier;
     }
@@ -73,10 +75,10 @@ const decreaseSupply = (name, amount, identifier) => async (supplyData) => {
         logError('That supply does not exist');
         return supplyData;
     }
-    const currVal = supplyData[name].amount;
-    const newVal = currVal - amount;
-    const newSupply = await updateSupply(name, newVal, identifier)(supplyData);
-    logSuccess('Decreased', name, 'to', newVal);
+    const currAmount = supplyData[name].amount;
+    const newAmount = currAmount - amount;
+    const newSupply = await updateSupply({ name, newAmount, identifier })(supplyData);
+    logSuccess('Decreased', name, 'to', newAmount);
     return newSupply;
 };
 
@@ -85,10 +87,10 @@ const increaseSupply = (name, amount, identifier) => async (supplyData) => {
         logError('That supply does not exist');
         return supplyData;
     }
-    const currVal = supplyData[name].amount;
-    const newVal = currVal + amount;
-    const newSupply = await updateSupply(name, newVal, identifier)(supplyData);
-    logSuccess('Increased', name, 'to', newVal);
+    const currAmount = supplyData[name].amount;
+    const newAmount = currAmount + amount;
+    const newSupply = await updateSupply({ name, newAmount, identifier })(supplyData);
+    logSuccess('Increased', name, 'to', newAmount);
     return newSupply;
 };
 
@@ -124,40 +126,40 @@ const init = async () => {
 const determineAction = (args) => {
     const argVector = args['_'];
     if (argVector.includes('create')) {
-        const supplyName = args['name'] || args['n'];
-        if (supplyName === undefined) {
+        const name = args['name'] || args['n'];
+        if (name === undefined) {
             logError('Usage: ./index.js create --name [-n] <name>');
             return;
         }
-        return createSupply(supplyName);
+        return createSupply(name);
     }
     if (argVector.includes('show')) {
-        const supplyName = argVector[1];
-        if (supplyName === undefined) {
+        const name = argVector[1];
+        if (name === undefined) {
             logError('Usage: ./index.js show <supply>');
             return;
         }
-        return displaySupply(supplyName);
+        return displaySupply(name);
     }
     if (argVector.includes('increase')) {
-        const supplyName = argVector[1];
+        const name = argVector[1];
         const identifier = args['i'] || args['identifier'];
         const amounts = args['e'] || args['element'];
-        if (supplyName === undefined) {
+        if (name === undefined) {
             logError('Usage: ./index.js increase <supplyName> [-i [--identifier] <identifier>] -e [--element] <element0>, -e [--element] /* ... ,*/ -e [--element] <elementN>');
             return;
         }
-        return increaseSupply(supplyName, sum(ensureArray(amounts)), identifier);
+        return increaseSupply(name, sum(ensureArray(amounts)), identifier);
     }
     if (argVector.includes('decrease')) {
-        const supplyName = argVector[1];
+        const name = argVector[1];
         const identifier = args['i'] || args['identifier'];
         const amounts = args['e'] || args['element'];
-        if (supplyName === undefined || amounts === undefined) {
+        if (name === undefined || amounts === undefined) {
             logError('Usage: ./index.js decrease <supplyName> [-i [--identifier] <identifier>] -e [--element] <element0>, -e [--element] /* ... ,*/ -e [--element] <elementN>');
             return;
         }
-        return decreaseSupply(supplyName, sum(ensureArray(amounts)), identifier);
+        return decreaseSupply(name, sum(ensureArray(amounts)), identifier);
     }
     if (argVector.includes('delete-all')) {
         if (!args['force']) {
@@ -173,24 +175,34 @@ const determineAction = (args) => {
         return displayAll();
     }
     if (argVector.includes('delete')) {
-        const supplyName = argVector[1];
-        if (supplyName === undefined) {
+        const name = argVector[1];
+        if (name === undefined) {
             logError('Usage: ./index.js delete <supplyName>');
             return;
         }
-        return deleteSupply(supplyName);
+        return deleteSupply(name);
     }
     if (argVector.includes('set')) {
-        const supplyName = argVector[1];
+        const name = argVector[1];
         const identifier = args['i'] || args['identifier'];
-        const amount = args['e'] || args['element'];
-        if (supplyName === undefined || amount === undefined) {
+        const newAmount = args['e'] || args['element'];
+        if (name === undefined || amount === undefined) {
             logError('Usage: ./index.js set <supplyName> [-i [--identifier] <identifier>] <amount>');
             return;
         }
-        logSuccess('Updated', chalk.yellow(supplyName), 'to', chalk.white(amount));
-        return updateSupply(supplyName, amount, identifier);
+        logSuccess('Updated', chalk.yellow(name), 'to', chalk.white(amount));
+        return updateSupply({ name, newAmount, identifier });
         
+    }
+    if (argVector.includes('set-identifier')) {
+        const name = argVector[1];
+        const identifier = args['i'] || args['identifier'];
+        if (name === undefined || identifier === undefined) {
+            logError('Usage: ./index.js set-identifier <supplyName> -i [--identifier] <identifier>');
+            return;
+        }
+        logSuccess('Set identifier for', chalk.yellow(name), 'to', chalk.white(identifier));
+        return updateSupply({ name, identifier });
     }
     if (args.usage) {
         logSuccess('Create a supply', chalk.green('./index.js create -n [--name] <supplyName>'));
